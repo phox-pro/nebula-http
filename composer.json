@@ -1,0 +1,22 @@
+{
+  "name": "phox-pro/nebula-http",
+  "description": "Http library for Nebula framework",
+  "type": "library",
+  "autoload": {
+    "psr-4": {
+      "Phox\\Nebula\\Http\\": "src/"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "Tests\\": "Tests/"
+    }
+  },
+  "require": {
+    "php": "^8.0",
+    "phox-pro/nebula-atom": "^0.2.2"
+  },
+  "require-dev": {
+    "phpunit/phpunit": "^9.3"
+  }
+}
