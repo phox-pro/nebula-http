@@ -14,7 +14,7 @@
   },
   "require": {
     "php": "^8.0",
-    "phox-pro/nebula-atom": "^0.2.2"
+    "phox-pro/nebula-atom": "dev-develop"
   },
   "require-dev": {
     "phpunit/phpunit": "^9.3"

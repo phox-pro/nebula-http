@@ -3,7 +3,7 @@
 namespace Tests\Unit;
 
 use Phox\Nebula\Atom\Implementation\Exceptions\AnotherInjectionExists;
-use Phox\Nebula\Atom\Notion\Interfaces\IStateContainer;
+use Phox\Nebula\Atom\Implementation\StateContainer;
 use Phox\Nebula\Http\Implementation\BodyDataResolver;
 use Phox\Nebula\Http\Implementation\ParamsValueContainer;
 use Phox\Nebula\Http\Implementation\Request;
@@ -32,7 +32,7 @@ class RequestTest extends TestCase
     {
         $_SERVER['CONTENT_TYPE'] = 'application/json';
 
-        $httpState = $this->container()->get(IStateContainer::class)->getState(HttpState::class);
+        $httpState = $this->container()->get(StateContainer::class)->getState(HttpState::class);
         $httpState->listen(function (Request $request) {
             $this->assertEquals('application/json', $request->getServerValue('CONTENT_TYPE'));
             $this->assertNull($request->getServerValue('UNKNOWN_KEY'));
@@ -50,7 +50,7 @@ class RequestTest extends TestCase
 
         $this->replaceOriginalBodyDataResolver('{"testFoo":"testBar"}');
 
-        $httpState = $this->container()->get(IStateContainer::class)->getState(HttpState::class);
+        $httpState = $this->container()->get(StateContainer::class)->getState(HttpState::class);
         $httpState->listen(fn(Request $request) => $this->assertEquals(
             ['testFoo' => 'testBar'],
             $request->getValues()->all(),
@@ -62,8 +62,20 @@ class RequestTest extends TestCase
     public function testAllRequestValues(): void
     {
         $_SERVER['CONTENT_TYPE'] = 'application/json';
+        $_REQUEST = ['testRequestFoo' => 'testRequestBar'];
 
         $this->replaceOriginalBodyDataResolver('{"testFoo":"testBar"}');
+
+        $httpState = $this->container()->get(StateContainer::class)->getState(HttpState::class);
+        $httpState->listen(function (Request $request) {
+            $this->assertTrue($request->getValues()->has('testRequestFoo'));
+            $this->assertTrue($request->getValues()->has('testFoo'));
+
+            $this->assertEquals('testRequestBar', $request->getValues()->get('testRequestFoo'));
+            $this->assertEquals('testBar', $request->getValues()->get('testFoo'));
+        });
+
+        $this->nebula->run();
     }
 
     protected function replaceOriginalBodyDataResolver(string $body): BodyDataResolver
